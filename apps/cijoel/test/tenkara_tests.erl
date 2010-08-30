@@ -51,6 +51,15 @@ the_tenkara_module_test_() ->
               App1 = tenkara:get(App, "/weird_path", fun() -> "handler!" end),
               Data = tenkara:handle_dynamic_request('GET', "/path", App1),
               ?assertEqual({static, "/path"}, Data)
+            end },
+
+          { "run ",
+            fun() ->
+              App1 = tenkara:get(App, ".*", fun(RequestPath) ->
+                lists:concat(["GET ", RequestPath])
+              end),
+              Data = tenkara:handle_dynamic_request('GET', "/path", App1),
+              ?assertEqual("GET /path", Data)
             end }
         ]
       end }

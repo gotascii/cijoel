@@ -46,12 +46,26 @@ the_tenkara_module_test_() ->
               ?assertEqual("handler!", Data)
             end },
           
-          { "not run a route handler that doesnt match a path",
+          { "run static handler if path is not matchable",
             fun() ->
               App1 = tenkara:get(App, "/weird_path", fun() -> "handler!" end),
               Data = tenkara:handle_dynamic_request('GET', "/path", App1),
               ?assertEqual({static, "/path"}, Data)
+            end },
+
+          { "run ",
+            fun() ->
+              App1 = tenkara:get(App, ".*", fun(RequestPath) ->
+                lists:concat(["GET ", RequestPath])
+              end),
+              Data = tenkara:handle_dynamic_request('GET', "/path", App1),
+              ?assertEqual("GET /path", Data)
             end }
+
+            % App1 = tenkara:get(App, "/*", fun(RequestPath) ->
+            %   lists:concat(["GET ", project_path(RequestPath)])
+            % end)
+
         ]
       end }
   ].

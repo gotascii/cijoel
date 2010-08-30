@@ -1,4 +1,4 @@
-%% script generated at {2010,8,19} {7,51,16}
+%% script generated at {2010,8,30} {16,20,26}
 {script,
     {"cijoel","1"},
     [{preLoaded,
@@ -66,7 +66,7 @@
           simple_bridge_response,simple_bridge_response_wrapper,
           yaws_request_bridge,yaws_response_bridge]},
      {path,["$ROOT/lib/cijoel-1/ebin"]},
-     {primLoad,[builder,request_handler]},
+     {primLoad,[app,builder,request_handler,tenkara]},
      {progress,modules_loaded},
      {path,
          ["$ROOT/lib/kernel-2.13.5/ebin","$ROOT/lib/stdlib-1.16.5/ebin",
@@ -225,7 +225,7 @@
                   [{description,[]},
                    {vsn,"1"},
                    {id,[]},
-                   {modules,[builder,request_handler]},
+                   {modules,[app,builder,request_handler,tenkara]},
                    {registered,[]},
                    {applications,[kernel,stdlib]},
                    {included_applications,[]},

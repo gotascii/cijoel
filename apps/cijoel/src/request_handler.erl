@@ -18,7 +18,7 @@ build_response({ResponseType, Data}, Info) ->
 
 do(Info) ->
   Request = build_request(Info),
-	Data = generate_response_data(Request),
+  Data = generate_response_data(Request),
 	build_response(Data, Info).
 
 generate_response_data(Request) ->

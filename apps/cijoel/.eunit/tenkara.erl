@@ -27,8 +27,15 @@ handle_dynamic_request(RequestMethod, RequestPath, App) ->
   Routes = dict:fetch(RequestMethod, App),
   MatchRoute = match_route(RequestPath),
   case lists:filter(MatchRoute, Routes) of
-    [] -> handle_static_request(RequestPath);
-    [{_, Handler}|_] -> Handler()
+    [{_, Handler}|_] ->
+      Info = erlang:fun_info(Handler),
+      {_, Arity} = lists:keyfind(arity, 1, Info),
+      Data = case Arity of
+        0 -> Handler();
+        1 -> Handler(RequestPath)
+      end,
+      {dynamic, Data};
+    _ -> handle_static_request(RequestPath)
   end.
 
 match_route(RequestPath) ->
