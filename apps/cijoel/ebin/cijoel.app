@@ -4,4 +4,4 @@
               {registered,[]},
               {applications,[kernel,stdlib]},
               {env,[]},
-              {modules,[builder,request_handler]}]}.
+              {modules,[app,builder,request_handler,tenkara]}]}.
