@@ -22,9 +22,6 @@ get(Path, Handler) ->
 post(Path, Handler) ->
   append('POST', Path, Handler).
 
-dynamic_request(RequestMethod, RequestPath) ->
-  gen_server:call(?MODULE, {RequestMethod, RequestPath}).
-
 append(Method, Path, Handler) ->
   gen_server:call(?MODULE, {Method, Path, Handler}).
 
@@ -35,26 +32,13 @@ handle_call({Method, Path, Handler}, _, RouteSet) ->
   {reply, ok, NewRouteSet};
 
 handle_call({RequestMethod, RequestPath}, _, RouteSet) ->
-  Routes = dict:fetch(RequestMethod, RouteSet),
-  Response = route(RequestPath, Routes),
+  Response = route(dynamic, RequestMethod, RequestPath, RouteSet),
   {reply, Response, RouteSet}.
 
-route(RequestPath, Routes) ->
-  case find(RequestPath, Routes) of
-    [{_, Handler}|_] -> {dynamic, Handler(RequestPath)};
-    _ -> static_request(RequestPath)
-  end.
-
 find(RequestPath, Routes)
-  lists:filter(match_route(RequestPath), Routes).
+  lists:filter(match(RequestPath), Routes).
 
-static_path(RequestPath) ->
-  lists:concat(["site/public", RequestPath]).
-
-static_request(RequestPath) ->
-  {static, RequestPath}.
-
-match_route(RequestPath) ->
+match(RequestPath) ->
   fun({Pattern, _}) ->
     case re:run(RequestPath, Pattern) of
       nomatch -> false;
@@ -62,14 +46,21 @@ match_route(RequestPath) ->
     end
   end.
 
-call(Request) ->
+route(Request) ->
   RequestPath = Request:path(),
-  StaticPath = static_path(RequestPath),
+  StaticPath = lists:concat(["site/public", RequestPath]),
   StaticPathExists = filelib:is_regular(StaticPath),
   if
-    StaticPathExists ->
-      static_request(RequestPath);
-    true ->
-      RequestMethod = Request:request_method(),
-      dynamic_request(RequestMethod, RequestPath)
+    StaticPathExists -> route(static, RequestPath);
+    true -> route(dynamic, Request:request_method(), RequestPath)
+  end;
+route(static, RequestPath) ->
+  {static, RequestPath};
+route(dynamic, RequestMethod, RequestPath) ->
+  gen_server:call(?MODULE, {RequestMethod, RequestPath});
+route(dynamic, RequestMethod, RequestPath, RouteSet) ->
+  Routes = dict:fetch(RequestMethod, RouteSet),
+  case find(RequestPath, Routes) of
+    [{_, Handler}|_] -> {dynamic, Handler(RequestPath)};
+    _ -> route(static, RequestPath)
   end.
