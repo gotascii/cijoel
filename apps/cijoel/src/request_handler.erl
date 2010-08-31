@@ -23,4 +23,4 @@ do(Info) ->
 
 generate_response_data(Request) ->
   App = app:init(),
-  tenkara:call(App, Request).
+  tenkara:call(Request).
