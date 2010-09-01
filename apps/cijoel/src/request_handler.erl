@@ -18,5 +18,5 @@ build_response({ResponseType, Data}, Info) ->
 
 do(Info) ->
   Request = build_request(Info),
-  Data = tenkara:route(Request),
+  Data = tenkara:handle(Request),
 	build_response(Data, Info).
